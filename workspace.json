@@ -1,4 +1,9 @@
 {
   "version": 2,
-  "projects": {}
+  "projects": {
+    "host": "apps/host",
+    "host-e2e": "apps/host-e2e",
+    "remote1": "apps/remote1",
+    "remote1-e2e": "apps/remote1-e2e"
+  }
 }

@@ -1,94 +1,60 @@
-
-
 # NxNgMfe
 
-This project was generated using [Nx](https://nx.dev).
+This project is an microfrontend PoC, based on this [guide](https://nx.dev/l/a/guides/setup-mfe-with-angular).
 
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
+## Environtment
 
-🔎 **Smart, Extensible Build Framework**
+node@16, @angular/cli@13, nx@13
 
-## Adding capabilities to your workspace
+## First steps
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+    npx create-nx-workspace nx-ng-mfe
+    
+Used the 'empty' preset.
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+    cd nx-ng-mfe
+    npm install --save-dev @nrwl/angular
 
-Below are our core plugins:
+## Creating two apps
 
-- [React](https://reactjs.org)
-  - `npm install --save-dev @nrwl/react`
-- Web (no framework frontends)
-  - `npm install --save-dev @nrwl/web`
-- [Angular](https://angular.io)
-  - `npm install --save-dev @nrwl/angular`
-- [Nest](https://nestjs.com)
-  - `npm install --save-dev @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `npm install --save-dev @nrwl/express`
-- [Node](https://nodejs.org)
-  - `npm install --save-dev @nrwl/node`
+We create two applications; one will act as the 'host', the other will act as the 'remote'. The remote mfeType creates a webpack configuration that is ready to be consumed by the host via module federation.
 
-There are also many [community plugins](https://nx.dev/community) you could add.
 
-## Generate an application
+  npx nx g @nrwl/angular:app host --mfe --mfeType=host --routing=true
+  npx nx g @nrwl/angular:app remote1 --mfe --mfeType=remote --port=4201 --host=host --routing=true
 
-Run `nx g @nrwl/react:app my-app` to generate an application.
+## Running the remote app
 
-> You can use any of the plugins above to generate applications as well.
+  nx run remote1:serve
 
-When using Nx, you can create multiple applications and libraries in the same workspace.
+NX bug: webpack is not installed. Manual solution:
 
-## Generate a library
+  npm install --save-dev webpack
+  npm install --save-dev webpack-dev-server
 
-Run `nx g @nrwl/react:lib my-lib` to generate a library.
+## Modify the remote app to render the entry component
 
-> You can also use any of the plugins above to generate libraries as well.
+Add the following route definition to the `app.module.ts` of the remote app:
 
-Libraries are shareable across libraries and applications. They can be imported from `@nx-ng-mfe/mylib`.
+    {path:'', loadChildren: () => import('./remote-entry/entry.module').then((m) => m.RemoteEntryModule)}
 
-## Development server
+Fix the scaffolded entry module - the original imports BrowserModule, replace it with CommonModule. Also remote the NX welcome component from the app component template (so only router outlet remains).
 
-Run `nx serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
+  nx run remote1:serve
 
-## Code scaffolding
+Now it will display the remote entry component because of the routing.
 
-Run `nx g @nrwl/react:component my-component --project=my-app` to generate a new component.
+## Run the host app
 
-## Build
+  nx run host:serve
 
-Run `nx build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Because of a webpack bug the host application keeps reloading, temporary fix is here https://github.com/angular-architects/module-federation-plugin/issues/96
 
-## Running unit tests
+  nx run remote1:serve --liveReload=false
+  nx run host:serve --liveReload=false
 
-Run `nx test my-app` to execute the unit tests via [Jest](https://jestjs.io).
-
-Run `nx affected:test` to execute the unit tests affected by a change.
-
-## Running end-to-end tests
-
-Run `ng e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
-
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
-
-## Understand your workspace
-
-Run `nx dep-graph` to see a diagram of the dependencies of your projects.
-
-## Further help
-
-Visit the [Nx Documentation](https://nx.dev) to learn more.
+When you navigate to the /remote1 route, the remote application will be consumed.
 
 
 
-## ☁ Nx Cloud
 
-### Distributed Computation Caching & Distributed Task Execution
-
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-cloud-card.png"></p>
-
-Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times. Even teams that are new to Nx can connect to Nx Cloud and start saving time instantly.
-
-Teams using Nx gain the advantage of building full-stack applications with their preferred framework alongside Nx’s advanced code generation and project dependency graph, plus a unified experience for both frontend and backend developers.
-
-Visit [Nx Cloud](https://nx.app/) to learn more.
