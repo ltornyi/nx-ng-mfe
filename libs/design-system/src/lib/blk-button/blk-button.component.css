@@ -1,0 +1,9 @@
+.blk-button {
+  border-radius: 1px;
+  /* background-color: beige; */
+  background-color: green;
+}
+
+.primary {
+  background-color: orange;
+}

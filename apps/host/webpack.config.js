@@ -21,6 +21,7 @@ sharedMappings.register(
   tsConfigPath,
   [
     /* mapped paths to share */
+    '@nx-ng-mfe/design-system'
   ],
   workspaceRootPath
 );

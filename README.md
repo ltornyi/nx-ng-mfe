@@ -61,7 +61,40 @@ When you navigate to the /remote1 route, the remote application will be consumed
 
 Style defined on the global stylesheet of the remote are not served when the host consumes the remote. See solution/workaround here: https://stackoverflow.com/questions/67633345/serving-styles-and-assets-with-webpack-5-module-federation
 
+## Adding an NX library
 
+The library will be shared across the host and the remote but we want it to be loaded only once. Steps to get there:
 
+### Create the library and add a component
 
+  nx generate @nrwl/angular:library design-system --buildable
+  nx g component blk-button --project=design-system --export
 
+### Modify the library's public API
+
+Add the following to the library's index.ts:
+
+  export * from './lib/blk-button/blk-button.component';
+
+This ensures the component is directly exported (not just through the module) so module federation will work correctly.
+
+### Modify the webpack config of the host and the remote
+
+When we created the library, NX added a new path to the root tsconfig.base.json:
+
+  "paths": {
+    "@nx-ng-mfe/design-system": ["libs/design-system/src/index.ts"]
+  }
+
+The same path needs to be added to each webpack config to indicate this is shared from a module federation perspective as well. Modify both `webpack.config.js` files at the sharedMappings.register call:
+
+  sharedMappings.register(
+    tsConfigPath,
+    [
+      /* mapped paths to share */
+      '@nx-ng-mfe/design-system'
+    ],
+    workspaceRootPath
+  );
+
+As usual, we can import the DesignSystemModule as usual in the remote and in the host and we can start using the components. At runtime, the shared chunk will only be loaded once.

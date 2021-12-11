@@ -1,6 +1,7 @@
 {
   "version": 2,
   "projects": {
+    "design-system": "libs/design-system",
     "host": "apps/host",
     "host-e2e": "apps/host-e2e",
     "remote1": "apps/remote1",
