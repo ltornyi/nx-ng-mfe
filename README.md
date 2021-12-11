@@ -53,7 +53,14 @@ Because of a webpack bug the host application keeps reloading, temporary fix is 
   nx run remote1:serve --liveReload=false
   nx run host:serve --liveReload=false
 
-When you navigate to the /remote1 route, the remote application will be consumed.
+When you navigate to the /remote1 route, the remote application will be consumed. You can simply build and run both microfrontends by
+
+  nx run host:serve-mfe --liveReload=false
+
+## Styling issues
+
+Style defined on the global stylesheet of the remote are not served when the host consumes the remote. See solution/workaround here: https://stackoverflow.com/questions/67633345/serving-styles-and-assets-with-webpack-5-module-federation
+
 
 
 
